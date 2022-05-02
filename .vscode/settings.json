@@ -1,0 +1,19 @@
+{
+  "debug.node.autoAttach": "on",
+  "mochaExplorer.cwd": "Server/",
+  "mochaExplorer.files": "Server/test/*.spec.js",
+  "mochaExplorer.exit": true,
+  "mochaExplorer.envPath": "Server/.env.testing",
+  "mochaExplorer.ui": "tdd",
+  "mochaExplorer.autoload": false,
+  "mochaExplorer.logpanel": true,
+  "mochaExplorer.ipcRole": "server",
+  "mochaExplorer.env": {
+    "VSCODE_VERSION": "insiders",
+    "ELECTRON_RUN_AS_NODE": null
+  },
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+}

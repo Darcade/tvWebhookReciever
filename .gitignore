@@ -1,0 +1,8 @@
+events.json
+subscriber.json
+store/
+node_modules/
+.nyc_output/
+coverage/
+ChromePlugin/tests/e2e/screenshots/*
+ChromePlugin/tests/e2e/videos/*

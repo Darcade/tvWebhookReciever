@@ -1,0 +1,156 @@
+stages:
+  - builddocker
+  - lint
+  - build
+  - test
+  - deploy
+  - release
+
+
+
+build-docker-image:
+  stage: builddocker
+  image: docker:latest
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - if [ -z "$CI_COMMIT_TAG" ]; then
+    - docker build --pull -f Dockerfile -t "$CI_REGISTRY_IMAGE:latestdev" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+    - docker push "$CI_REGISTRY_IMAGE:latestdev"
+    - else
+    - docker build --pull -f Dockerfile -t "$CI_REGISTRY_IMAGE:latestdev" -t "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+    - docker push "$CI_REGISTRY_IMAGE:latestdev"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - fi
+  
+lint_frontend:
+  stage: lint
+  image: $CI_REGISTRY_IMAGE:latestdev
+  script:
+    - BUILDDIR=$(pwd)
+    - cd /usr/src/ChromePlugin
+    - npx eslint ./
+
+lint_backend:
+  stage: lint
+  image: $CI_REGISTRY_IMAGE:latestdev
+  script:
+    - BUILDDIR=$(pwd)
+    - cd /usr/src/ChromePlugin
+    - npm run lint
+
+test_backend:
+  stage: test
+  image: $CI_REGISTRY_IMAGE:latestdev
+  artifacts:
+    paths:
+      - public
+  coverage: '/Statements\s+:\s(\d+.?\d+)%/'
+  script:
+    - BUILDDIR=$(pwd)
+    - cd /usr/src/Server
+    - npm run-script testcov
+    - npx nyc report --reporter=html
+    - npx nyc report --reporter=text-summary
+    - mkdir -p $BUILDDIR/public/unit/backend
+    - mkdir -p $BUILDDIR/public/e2e/frontend
+    - mkdir -p $BUILDDIR/public/e2e/backend
+    - cp -R ./coverage/* $BUILDDIR/public/unit/backend
+    - cd $BUILDDIR
+    
+test_e2e:
+  image: $CI_REGISTRY_IMAGE:latestdev
+  #cypress/browsers:node16.13.2-chrome97-ff96
+  stage: test
+  script:
+    - BUILDDIR=$(pwd)
+    - cd $BUILDDIR/ChromePlugin && npm install
+    - cd $BUILDDIR/Server && npm install
+    - cd $BUILDDIR/Server
+    # start the server in the background
+    - npm run testAllHeadless:e2e || true
+    # copy files to corresponding paths
+    - mkdir -p $BUILDDIR/public/unit/backend
+    - mkdir -p $BUILDDIR/public/e2e/frontend
+    - mkdir -p $BUILDDIR/public/e2e/backend
+    - ls -la $BUILDDIR/Server
+    - ls -la $BUILDDIR/ChromePlugin
+    - cp -R $BUILDDIR/ChromePlugin/coverage/* $BUILDDIR/public/e2e/backend
+    - cp -R $BUILDDIR/ChromePlugin/coverage/lcov-report/* $BUILDDIR/public/e2e/frontend
+  artifacts:
+    when: always
+    paths:
+      - public/
+      - ChromePlugin/tests/e2e/videos/**/*.mp4
+      - ChromePlugin/tests/e2e/screenshots/**/*.png
+    expire_in: 1 day
+
+
+pages:
+  stage: deploy
+  image: alpine:latest
+  artifacts:
+    paths:
+      - public
+  script:
+    - ls -la
+    - ls -la public
+    - ls -la public/e2e
+    - ls -la public/e2e/frontend
+    - ls -la public/e2e/backend
+    - ls -la public/unit/backend
+    
+    
+deploy_staging:
+  stage: deploy
+  when: manual
+  image: docker:latest
+  environment: prelive
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker stop mongo_webhook_staging || true
+    - docker rm mongo_webhook_staging || true
+    - docker stop tvwebhook_staging || true
+    - docker rm tvwebhook_staging || true
+    
+    - docker network create -d bridge webhookTestEnv || true
+    - docker run -d --network webhookTestEnv --name mongo_webhook_staging --env-file=./.env -v mongodb_data_container:/data/db mongo:latest
+    - docker run -d --network webhookTestEnv --label "traefik.frontend.rule=Host:hooktest.darcade.de" --label "traefik.port=41555" --label "traefik.backend=hookApiBackend_staging" --label "traefik.frontend.entryPoints=https" --label "traefik.docker.network=web" --env-file=./.env  -v tvwebhook_staging_store:/usr/src/store:rw --name tvwebhook_staging --restart=always $CI_REGISTRY_IMAGE:latestdev
+    - docker network connect web tvwebhook_staging
+
+
+
+
+release:
+  # Caution, as of 2021-02-02 these assets links require a login, see:
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/299384
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - |
+      release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG 
+
+
+deploy_prod:
+  stage: release
+  when: manual
+  rules:
+    - if: $CI_COMMIT_TAG
+  image: docker:latest
+  environment: prod
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker stop tvwebhook_prod || true
+    - docker rm tvwebhook_prod || true
+    
+    - docker network create -d bridge webhookProdEnv || true
+    # database needs to be deployed manually from /home/darcade/tvWebhook/startDbService
+    - docker run -d --network webhookProdEnv --label "traefik.frontend.rule=Host:xxx.darcade.de" --label "traefik.port=41555" --label "traefik.backend=hookApiBackend_prod" --label "traefik.frontend.entryPoints=https" --label "traefik.docker.network=web" --env-file=/tvProdEnvMount/.env_prod  -v tvwebhook_prod_store:/usr/src/store:rw --name tvwebhook_prod --restart=always $CI_REGISTRY_IMAGE:latestdev
+    - docker network connect web tvwebhook_prod
+    

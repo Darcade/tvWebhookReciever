@@ -1,0 +1,33 @@
+version: "2"
+
+networks:
+  web:
+    external: true
+
+services:
+  tvwebhook:
+    build: .
+    restart: always 
+    image: tvwebhookserver:latest
+    env_file:
+      - .env
+    volumes:
+      - ./store:/usr/src/store:rw
+    networks:
+      - web
+    labels:
+      - "traefik.frontend.rule=Host:xxx.darcade.de"
+      - "traefik.port=41555"
+      - "traefik.backend=hookApiBackend"
+      - "traefik.frontend.entryPoints=https"
+      - "traefik.docker.network=web"
+  mongodb:
+    restart: always 
+    image: mongo:latest
+    env_file:
+      - .env
+    volumes:
+      - mongodb_data_container:/data/db
+
+volumes:
+  mongodb_data_container:

@@ -1,0 +1,6 @@
+node_modules
+Server/node_modules
+Server/store/*
+Server/public/artifacts/*
+ChromePlugin/node_modules
+npm-debug.log

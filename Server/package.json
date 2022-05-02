@@ -1,0 +1,63 @@
+{
+  "name": "webhooktradereciever",
+  "version": "22.12.3",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "start-localDockerDB": "npx dotenv -e ../.env.localtest node ./bin/www",
+    "start-localDockerDb-MonFileReload": "npx dotenv -e ../.env.localtest nodemon ./bin/www",
+
+    "start-testEnvTempDB": "dotenv -e ./.env.testing nyc --reporter=html node ./bin/www",
+    "start-testEnvTempDB-MonFileReload": "dotenv -e ./.env.testing nodemon ./bin/www",
+    
+    
+    "testAllHeadless:e2e": "concurrently --kill-others \"cd ../ChromePlugin && npm run-script testAllHeadless:e2e\" \"npm run start-testEnvTempDB\"",
+    "fullE2ETest": "concurrently --kill-others \"cd ../ChromePlugin && npm run-script test:e2e\" \"npm run start-testEnvTempDB\"",
+    
+    
+    "runDevFrontend": "cd ../ChromePlugin/ && npm run-script serveApp",
+    
+    "lint": "eslint ./",
+    "test": "npx dotenv -e ./.env.testing npx mocha test/*.js --exit",
+    "testcov": "dotenv -e ./.env.testing nyc --reporter=html mocha  test/*.js --exit",
+
+    "generateKey": "node ./bin/envKeyGenerator.js"
+  },
+  "dependencies": {
+    "@sentry/node": "^6.17.9",
+    "@sentry/tracing": "^6.17.9",
+    "axios": "^0.21.1",
+    "ccxt": "^1.47.28",
+    "chalk": "^4.1.0",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1",
+    "node-localstorage": "^2.1.6",
+    "urlsafe-base64": "^1.0.0",
+    "web-push": "^3.4.4"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
+    "chai-like": "^1.1.1",
+    "chai-subset": "^1.6.0",
+    "chai-things": "^0.2.0",
+    "concurrently": "^7.0.0",
+    "dotenv": "^16.0.0",
+    "dotenv-cli": "^5.0.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "mocha": "^9.2.0",
+    "mongodb-memory-server": "^8.3.0",
+    "mongoose": "^6.2.2",
+    "nyc": "^15.1.0",
+    "prettier": "^2.5.1"
+  }
+}

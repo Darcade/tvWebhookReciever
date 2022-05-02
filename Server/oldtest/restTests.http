@@ -1,0 +1,139 @@
+POST http://localhost:41555/api/1/BTCUSD/BUY/1234/1
+content-type: application/json
+
+{"authKey":"51Asfat512451AaSFasgasdgasdg"}
+
+
+###
+
+GET http://localhost:41555/pluginApi/events
+Authorization: Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ
+
+###
+
+GET http://localhost:41555/pluginApi/accounts
+Authorization: Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ
+###
+
+GET http://localhost:41555/pluginApi/ticker/BTC/USD
+Authorization: Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ
+
+###
+
+GET http://localhost:41555/pluginApi/1/markets
+Authorization: Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ
+
+###
+
+GET http://localhost:41555/pluginApi/alerts
+Authorization: Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ
+### new API
+GET http://localhost:41555/pluginApi/positions
+Authorization: Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ
+
+####
+
+GET http://localhost:41555/download
+
+
+
+###
+DELETE http://localhost:41555/alert/222
+
+
+###
+POST http://localhost:41555/alert
+content-type: application/json
+
+{
+    "ID": 222,
+    "created": 1641907464546,
+    "updated": 1641907464546,
+    "name": "Testalert",
+    "symbol": "BTCUSD",
+    "account": 1,
+    "action": "Buy",
+    "orderPrice": 0,
+    "orderQuantity": 0,
+    "orderType": "Market"
+}
+
+
+###
+
+GET https://hookapi.darcade.de/pluginApi/ticker/BTC/USD
+Authorization: Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ
+
+###
+
+POST https://hookapi.darcade.de/api/1/BTCUSD/Buy/0/1
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ","ID":1,"orderParams":{},"triggerData":{"comment":"Generated using alert generator"}}
+
+
+###
+
+POST http://localhost:41555/api/1/BTCUSD/Buy/0/1
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ","ID":1,"orderParams":{},"triggerData":{"comment":"Generated using alert generator"}}
+
+
+###
+
+POST http://localhost:41555/api/1/ETHUSD/Buy/0/1
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ","ID":3,"orderParams":{},"triggerData":{"comment":"Generated using alert generator"}}
+
+### OLD API
+POST https://hookapi.darcade.de/api/2/cETHUSD/Buy/0/1
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ","ID":3,"orderParams":{},"triggerData":{"comment":"Generated using alert generator"}}
+
+
+### new API
+POST http://localhost:41555/api/alert/1
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ"}
+
+
+### new API
+POST http://localhost:41555/api/alert/
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ"}
+
+###
+
+POST https://hookapi.darcade.de/api/alert/7
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ"}
+
+
+###
+
+POST https://hookapi.darcade.de/api/strategyalert/15sek
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ","strategyAlert":{"alert_message":"","comment":"EL", "position_size":1,"action":"buy", "price": 42924.5}}
+
+
+###
+
+POST https://hookapi.darcade.de/api/strategyalert/1min
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ","strategyAlert":{"alert_message":"","comment":"EL", "position_size":1,"action":"buy", "price": 42924.5}}
+
+
+###
+
+POST https://hookapi.darcade.de/api/strategyalert
+content-type: application/json
+
+{"authKey":"Q9kpO0RIAup2Qkp4ejBajxKyeHnkrP4ehFrjrTHBzRmaKgnNoOxlD84zZpmEemDQ","strategyAlert":{"alert_message":"","comment":"EL", "position_size":1,"action":"buy", "price": 42924.5}}
