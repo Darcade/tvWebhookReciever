@@ -2,7 +2,6 @@ const express = require('express');
 const ccxt = require('ccxt');
 
 const router = new express.Router();
-const accounts = require('../accounts');
 const TradingExecutor = require('../TradingExecutor');
 const EventStore = require('../EventStore');
 const AccountStore = require('../AccountStore');
@@ -110,7 +109,7 @@ router.get('/positions', async function (req, res) {
 });
 
 
-router.get('/:accountid/markets', async function (req, res) {
+/*router.get('/:accountid/markets', async function (req, res) {
   if (req.params.accountid) {
     const cAcc = accounts.find((acc) => acc.ID == Number(req.params.accountid));
     if (cAcc && cAcc.ccxt) {
@@ -129,7 +128,7 @@ router.get('/:accountid/markets', async function (req, res) {
       console.error('AccountID not found');
     }
   }
-});
+});*/
 
 /**
  * Returns list of accounts for fomular in browser plugin
